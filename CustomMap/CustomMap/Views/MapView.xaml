@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:behaviors="http://xamarin.com/schemas/2020/toolkit"
+             xmlns:map="clr-namespace:CustomMap.Map;assembly=CustomMap"
+             x:Class="CustomMap.Views.MapView">
+    <StackLayout>
+        <Frame BackgroundColor="CornflowerBlue"
+               Padding="26"
+               CornerRadius="0">
+            <Label Text="{Binding Title}"
+                   BackgroundColor="CornflowerBlue"
+                   TextColor="White"
+                   FontSize="24"
+                   HorizontalTextAlignment="Center"/>
+        </Frame>
+        <map:Map
+            x:Name="MyCustomMap"
+            ItemsSource="{Binding Locations}"
+            MapType="Street"
+            IsShowingUser="True">
+            <map:Map.ItemTemplate>
+                <DataTemplate>
+                    <map:Pin Position="{Binding Position}"
+                                   Address="{Binding Id}"
+                                   Label="{Binding Label}"
+                                   ImageSource="{Binding PinIcon}">
+                    </map:Pin>
+                </DataTemplate>
+            </map:Map.ItemTemplate>
+        </map:Map>
+    </StackLayout>
+</ContentPage>

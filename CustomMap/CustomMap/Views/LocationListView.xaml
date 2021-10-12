@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CustomMap.Views.LocationListView">
+    <ContentPage.Content>
+        <StackLayout>
+            <Label Text="Hello, from the location list!"
+                   VerticalOptions="CenterAndExpand"
+                   HorizontalOptions="CenterAndExpand" />
+            <ListView x:Name="ListView" 
+                ItemsSource="{Binding Locations}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ImageCell ImageSource="{Binding PinIcon}" Text="{Binding Label}" Detail="{Binding Address}">
+                            <ImageCell.ContextActions>
+                                <MenuItem Text="Blue" 
+                                          Command="{Binding Path=BindingContext.ChangeColorBlueCommand, Source={x:Reference ListView}}" 
+                                          CommandParameter="{Binding .}"/>
+                                <MenuItem Text="Red" 
+                                          Command="{Binding Path=BindingContext.ChangeColorRedCommand, Source={x:Reference ListView}}" 
+                                          CommandParameter="{Binding .}"/>
+                                <MenuItem Text="Black" 
+                                          Command="{Binding Path=BindingContext.ChangeColorBlackCommand, Source={x:Reference ListView}}" 
+                                          CommandParameter="{Binding .}"/>
+                                <MenuItem Text="Green" 
+                                          Command="{Binding Path=BindingContext.ChangeColorGreenCommand, Source={x:Reference ListView}}" 
+                                          CommandParameter="{Binding .}"/>
+                            </ImageCell.ContextActions>
+                        </ImageCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
