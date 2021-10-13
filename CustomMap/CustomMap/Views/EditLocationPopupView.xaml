@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<xct:Popup xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+             Size="250,200"
+             x:Class="CustomMap.Views.PinClickedPopupView">
+    <StackLayout>
+        <Label Text="{Binding Title}"
+               VerticalOptions="CenterAndExpand"
+               HorizontalOptions="CenterAndExpand"
+               FontAttributes="Bold"/>
+        <Label Text="{Binding Address}" 
+               FontSize="Small"
+               VerticalOptions="CenterAndExpand"
+               HorizontalOptions="Center"/>
+        <StackLayout Orientation="Horizontal"
+                     VerticalOptions="CenterAndExpand"
+                     HorizontalOptions="CenterAndExpand">
+            <Button BackgroundColor="IndianRed">
+                <Button.Behaviors>
+                    <xct:EventToCommandBehavior 
+                        EventName="Clicked"
+                        Command="{Binding ChangeColorRedCommand}"/>
+                </Button.Behaviors>
+            </Button>
+            <Button BackgroundColor="RoyalBlue">
+                <Button.Behaviors>
+                    <xct:EventToCommandBehavior 
+                        EventName="Clicked"
+                        Command="{Binding ChangeColorBlueCommand}"/>
+                </Button.Behaviors>
+            </Button>
+            <Button BackgroundColor="SeaGreen">
+                <Button.Behaviors>
+                    <xct:EventToCommandBehavior 
+                        EventName="Clicked"
+                        Command="{Binding ChangeColorGreenCommand}"/>
+                </Button.Behaviors>
+            </Button>
+            <Button BackgroundColor="Black">
+                <Button.Behaviors>
+                    <xct:EventToCommandBehavior 
+                        EventName="Clicked"
+                        Command="{Binding ChangeColorBlackCommand}"/>
+                </Button.Behaviors>
+            </Button>
+        </StackLayout>
+    </StackLayout>
+</xct:Popup>

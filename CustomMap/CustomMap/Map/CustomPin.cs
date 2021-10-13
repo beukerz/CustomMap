@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Threading;
 using Xamarin.Forms;
+using Xamarin.Forms.Maps;
 
 namespace CustomMap.Map
 {
