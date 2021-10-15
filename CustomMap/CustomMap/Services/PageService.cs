@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Xamarin.CommunityToolkit.Extensions;
 using Xamarin.CommunityToolkit.UI.Views;
 using Xamarin.Forms;
 
@@ -7,25 +8,27 @@ namespace CustomMap.Services
     public interface IPageService
     {
         Task PushAsync(Page page);
-        Task ShowPopup(Popup popup);
+        Task<object> ShowPopupAsync(Popup popup);
         Task<bool> DisplayAlert(string title, string message, string ok, string cancel);
     }
 
     public class PageService : IPageService
     {
-        public Task PushAsync(Page page)
+        private Page MainPage => Application.Current.MainPage;
+
+        public async Task PushAsync(Page page)
         {
-            throw new System.NotImplementedException();
+            await MainPage.Navigation.PushAsync(page);
         }
 
-        public Task ShowPopup(Popup popup)
+        public async Task<object> ShowPopupAsync(Popup popup)
         {
-            throw new System.NotImplementedException();
+            return await MainPage.ShowPopupAsync(popup);
         }
 
-        public Task<bool> DisplayAlert(string title, string message, string ok, string cancel)
+        public async Task<bool> DisplayAlert(string title, string message, string ok, string cancel)
         {
-            throw new System.NotImplementedException();
+            return await MainPage.DisplayAlert(title, message, ok, cancel);
         }
     }
 }

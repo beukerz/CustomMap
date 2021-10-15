@@ -14,6 +14,7 @@ using ObjCRuntime;
 using UIKit;
 using Xamarin;
 using Xamarin.Forms;
+using Xamarin.Forms.Maps;
 using Xamarin.Forms.Platform.iOS;
 using RectangleF = CoreGraphics.CGRect;
 
@@ -27,7 +28,7 @@ namespace CustomMap.iOS.Renderers
         private static readonly Lazy<UIImage> UIImageEmpty = new Lazy<UIImage>(() => new UIImage());
         private static readonly UIColor Transparent = Color.Transparent.ToUIColor();
 
-        private readonly Dictionary<IMKAnnotation, Pin> _pinLookup = new Dictionary<IMKAnnotation, Pin>();
+        private readonly Dictionary<IMKAnnotation, CustomPin> _pinLookup = new Dictionary<IMKAnnotation, CustomPin>();
         private readonly Dictionary<IMKOverlay, MapElement> _elementLookup = new Dictionary<IMKOverlay, MapElement>();
 
         private readonly SemaphoreSlim _imgCacheSemaphore = new SemaphoreSlim(1, 1);
@@ -42,7 +43,7 @@ namespace CustomMap.iOS.Renderers
         protected MKUserTrackingButton UserTrackingButton;
 
         protected MKMapView MapNative => Control as MKMapView;
-        protected Map.Map MapModel => Element as Map.Map;
+        protected Map.CustomMap CustomMapModel => Element as Map.CustomMap;
 
         protected bool IsDarkMode => FormsBetterMaps.iOs13OrNewer && TraitCollection?.UserInterfaceStyle == UIUserInterfaceStyle.Dark;
 
@@ -63,9 +64,9 @@ namespace CustomMap.iOS.Renderers
 
             if (disposing)
             {
-                if (MapModel != null)
+                if (CustomMapModel != null)
                 {
-                    CleanUpMapModelElements(MapModel, MapNative);
+                    CleanUpMapModelElements(CustomMapModel, MapNative);
                 }
 
                 if (MapNative != null)
@@ -87,7 +88,7 @@ namespace CustomMap.iOS.Renderers
 
             if (e.OldElement != null)
             {
-                CleanUpMapModelElements((Map.Map)e.OldElement, oldMapView);
+                CleanUpMapModelElements((Map.CustomMap)e.OldElement, oldMapView);
             }
 
             if (oldMapView != null)
@@ -99,7 +100,7 @@ namespace CustomMap.iOS.Renderers
 
             if (e.NewElement != null)
             {
-                var mapModel = (Map.Map)e.NewElement;
+                var mapModel = (Map.CustomMap)e.NewElement;
 
                 MapNative.GetViewForAnnotation = GetViewForAnnotation;
                 MapNative.OverlayRenderer = GetViewForOverlay;
@@ -108,7 +109,7 @@ namespace CustomMap.iOS.Renderers
                 MapNative.RegionChanged += MkMapViewOnRegionChanged;
                 MapNative.AddGestureRecognizer(_mapClickedGestureRecognizer = new UITapGestureRecognizer(OnMapClicked));
 
-                MessagingCenter.Subscribe<Map.Map, MapSpan>(this, Map.Map.MoveToRegionMessageName, (s, a) => MoveToRegion(a), mapModel);
+                MessagingCenter.Subscribe<Map.CustomMap, MapSpan>(this, Map.CustomMap.MoveToRegionMessageName, (s, a) => MoveToRegion(a), mapModel);
 
                 UpdateTrafficEnabled();
                 UpdateMapTheme();
@@ -145,26 +146,26 @@ namespace CustomMap.iOS.Renderers
         {
             base.OnElementPropertyChanged(sender, e);
 
-            if (e.PropertyName == Map.Map.MapThemeProperty.PropertyName)
+            if (e.PropertyName == Map.CustomMap.MapThemeProperty.PropertyName)
                 UpdateMapTheme();
-            else if (e.PropertyName == Map.Map.MapTypeProperty.PropertyName)
+            else if (e.PropertyName == Map.CustomMap.MapTypeProperty.PropertyName)
                 UpdateMapType();
-            else if (e.PropertyName == Map.Map.IsShowingUserProperty.PropertyName)
+            else if (e.PropertyName == Map.CustomMap.IsShowingUserProperty.PropertyName)
                 UpdateShowUserLocation();
-            else if (e.PropertyName == Map.Map.ShowUserLocationButtonProperty.PropertyName)
+            else if (e.PropertyName == Map.CustomMap.ShowUserLocationButtonProperty.PropertyName)
                 UpdateShowUserLocationButton();
-            else if (e.PropertyName == Map.Map.ShowCompassProperty.PropertyName)
+            else if (e.PropertyName == Map.CustomMap.ShowCompassProperty.PropertyName)
                 UpdateShowCompass();
-            else if (e.PropertyName == Map.Map.SelectedPinProperty.PropertyName)
+            else if (e.PropertyName == Map.CustomMap.SelectedPinProperty.PropertyName)
                 UpdateSelectedPin();
-            else if (e.PropertyName == Map.Map.HasScrollEnabledProperty.PropertyName)
+            else if (e.PropertyName == Map.CustomMap.HasScrollEnabledProperty.PropertyName)
                 UpdateHasScrollEnabled();
-            else if (e.PropertyName == Map.Map.HasZoomEnabledProperty.PropertyName)
+            else if (e.PropertyName == Map.CustomMap.HasZoomEnabledProperty.PropertyName)
                 UpdateHasZoomEnabled();
-            else if (e.PropertyName == Map.Map.TrafficEnabledProperty.PropertyName)
+            else if (e.PropertyName == Map.CustomMap.TrafficEnabledProperty.PropertyName)
                 UpdateTrafficEnabled();
-            else if (e.PropertyName == VisualElement.HeightProperty.PropertyName && MapModel.LastMoveToRegion != null)
-                _shouldUpdateRegion = MapModel.MoveToLastRegionOnLayoutChange;
+            else if (e.PropertyName == VisualElement.HeightProperty.PropertyName && CustomMapModel.LastMoveToRegion != null)
+                _shouldUpdateRegion = CustomMapModel.MoveToLastRegionOnLayoutChange;
         }
 
         public override void LayoutSubviews()
@@ -176,8 +177,8 @@ namespace CustomMap.iOS.Renderers
             {
                 // initial region
                 _init = false;
-                if (MapModel.LastMoveToRegion != null)
-                    MoveToRegion(MapModel.LastMoveToRegion, false);
+                if (CustomMapModel.LastMoveToRegion != null)
+                    MoveToRegion(CustomMapModel.LastMoveToRegion, false);
             }
 
             UpdateRegion();
@@ -185,8 +186,8 @@ namespace CustomMap.iOS.Renderers
         #endregion
 
         #region Annotations
-        protected virtual IMKAnnotation CreateAnnotation(Pin pin)
-            => new FormsMKPointAnnotation(pin);
+        protected virtual IMKAnnotation CreateAnnotation(CustomPin customPin)
+            => new FormsMKPointAnnotation(customPin);
 
         protected virtual MKAnnotationView GetViewForAnnotation(MKMapView mapView, IMKAnnotation annotation)
         {
@@ -201,7 +202,7 @@ namespace CustomMap.iOS.Renderers
             const string customImgAnnotationId = nameof(customImgAnnotationId);
 
             var fAnnotation = (FormsMKPointAnnotation)annotation;
-            var pin = fAnnotation.Pin;
+            var pin = fAnnotation.CustomPin;
 
             pin.ImageSourceCts?.Cancel();
             pin.ImageSourceCts?.Dispose();
@@ -298,15 +299,19 @@ namespace CustomMap.iOS.Renderers
 
             if (pin != null)
             {
-                if (!ReferenceEquals(pin, MapModel.SelectedPin))
+                if (!ReferenceEquals(pin, CustomMapModel.SelectedCustomPin))
                 {
-                    MapModel.SelectedPin = pin;
+                    CustomMapModel.SelectedCustomPin = pin;
                 }
 
                 // SendMarkerClick() returns the value of PinClickedEventArgs.HideInfoWindow
                 // Hide the info window by deselecting the annotation
-                var deselect = MapModel.SendPinClick(pin);
-                if (deselect) MapNative.DeselectAnnotation(annotation, false);
+                var deselect = CustomMapModel.SendPinClick(pin);
+                if (deselect)
+                {
+                    // pin.Label = String.Empty;
+                    MapNative.DeselectAnnotation(annotation, false);
+                }
             }
         }
 
@@ -319,10 +324,10 @@ namespace CustomMap.iOS.Renderers
                     r.Dispose();
                 }
 
-            if (GetPinForAnnotation(e.View.Annotation) is Pin pin &&
-                ReferenceEquals(MapModel.SelectedPin, pin))
+            if (GetPinForAnnotation(e.View.Annotation) is CustomPin pin &&
+                ReferenceEquals(CustomMapModel.SelectedCustomPin, pin))
             {
-                MapModel.SelectedPin = null;
+                CustomMapModel.SelectedCustomPin = null;
             }
         }
 
@@ -336,7 +341,7 @@ namespace CustomMap.iOS.Renderers
 
             // SendInfoWindowClick() returns the value of PinClickedEventArgs.HideInfoWindow
             // Hide the info window by deselecting the annotation
-            var deselect = MapModel.SendInfoWindowClick(targetPin);
+            var deselect = CustomMapModel.SendInfoWindowClick(targetPin);
             if (deselect) MapNative.DeselectAnnotation(annotation, true);
         }
 
@@ -348,7 +353,7 @@ namespace CustomMap.iOS.Renderers
             // pin not found. Must have been activated outside of forms
             if (targetPin == null) return;
 
-            var deselect = MapModel.SendInfoWindowLongClick(targetPin);
+            var deselect = CustomMapModel.SendInfoWindowLongClick(targetPin);
             if (deselect) MapNative.DeselectAnnotation(annotation, true);
         }
         #endregion
@@ -356,28 +361,39 @@ namespace CustomMap.iOS.Renderers
         #region Map
         private void OnMapClicked(UITapGestureRecognizer recognizer)
         {
-            if (Element == null) return;
+            if (CustomMapModel?.CanSendMapClicked() != true)
+                return;
 
-            var tapPoint = recognizer.LocationInView(Control);
-            var tapGPS = MapNative.ConvertPoint(tapPoint, Control);
-            MapModel.SendMapClicked(new Position(tapGPS.Latitude, tapGPS.Longitude));
+            var mapNative = MapNative;
+
+            var pinTapped = mapNative.Annotations
+                .Select(a => mapNative.ViewForAnnotation(a))
+                .Where(v => v != null)
+                .Any(v => v.PointInside(recognizer.LocationInView(v), null));
+
+            if (!pinTapped)
+            {
+                var tapPoint = recognizer.LocationInView(mapNative);
+                var tapGPS = mapNative.ConvertPoint(tapPoint, Control);
+                CustomMapModel.SendMapClicked(new Position(tapGPS.Latitude, tapGPS.Longitude));
+            }
         }
 
         private void UpdateRegion()
         {
             if (_shouldUpdateRegion)
             {
-                MoveToRegion(MapModel.LastMoveToRegion, false);
+                MoveToRegion(CustomMapModel.LastMoveToRegion, false);
                 _shouldUpdateRegion = false;
             }
         }
 
         private void MkMapViewOnRegionChanged(object sender, MKMapViewChangeEventArgs e)
         {
-            if (MapModel == null) return;
+            if (CustomMapModel == null) return;
 
             var pos = new Position(MapNative.Region.Center.Latitude, MapNative.Region.Center.Longitude);
-            MapModel.SetVisibleRegion(new MapSpan(pos, MapNative.Region.Span.LatitudeDelta, MapNative.Region.Span.LongitudeDelta, MapNative.Camera.Heading));
+            CustomMapModel.SetVisibleRegion(new MapSpan(pos, MapNative.Region.Span.LatitudeDelta, MapNative.Region.Span.LongitudeDelta));
         }
 
         private void MoveToRegion(MapSpan mapSpan, bool animated = true)
@@ -388,38 +404,38 @@ namespace CustomMap.iOS.Renderers
 
         private void UpdateHasScrollEnabled()
         {
-            MapNative.ScrollEnabled = MapModel.HasScrollEnabled;
+            MapNative.ScrollEnabled = CustomMapModel.HasScrollEnabled;
         }
 
         private void UpdateTrafficEnabled()
         {
-            MapNative.ShowsTraffic = MapModel.TrafficEnabled;
+            MapNative.ShowsTraffic = CustomMapModel.TrafficEnabled;
         }
 
         private void UpdateHasZoomEnabled()
         {
-            MapNative.ZoomEnabled = MapModel.HasZoomEnabled;
+            MapNative.ZoomEnabled = CustomMapModel.HasZoomEnabled;
         }
 
         private void UpdateShowUserLocation()
         {
-            if (MapModel.IsShowingUser && _locationManager == null)
+            if (CustomMapModel.IsShowingUser && _locationManager == null)
             {
                 _locationManager = new CLLocationManager();
                 _locationManager.RequestWhenInUseAuthorization();
             }
-            else if (!MapModel.IsShowingUser && _locationManager != null)
+            else if (!CustomMapModel.IsShowingUser && _locationManager != null)
             {
                 _locationManager.Dispose();
                 _locationManager = null;
             }
 
-            MapNative.ShowsUserLocation = MapModel.IsShowingUser;
+            MapNative.ShowsUserLocation = CustomMapModel.IsShowingUser;
         }
 
         protected virtual void UpdateShowUserLocationButton()
         {
-            if (MapModel.ShowUserLocationButton && UserTrackingButton == null)
+            if (CustomMapModel.ShowUserLocationButton && UserTrackingButton == null)
             {
                 const float utSize = 48f;
 
@@ -446,7 +462,7 @@ namespace CustomMap.iOS.Renderers
                     UserTrackingButton.HeightAnchor.ConstraintEqualTo(UserTrackingButton.WidthAnchor),
                 });
             }
-            else if (!MapModel.ShowUserLocationButton && UserTrackingButton != null)
+            else if (!CustomMapModel.ShowUserLocationButton && UserTrackingButton != null)
             {
                 UserTrackingButton.RemoveFromSuperview();
                 UserTrackingButton.Dispose();
@@ -456,12 +472,12 @@ namespace CustomMap.iOS.Renderers
 
         private void UpdateShowCompass()
         {
-            MapNative.ShowsCompass = MapModel.ShowCompass;
+            MapNative.ShowsCompass = CustomMapModel.ShowCompass;
         }
 
         private void UpdateSelectedPin()
         {
-            var pin = MapModel.SelectedPin;
+            var pin = CustomMapModel.SelectedCustomPin;
 
             if (pin == null)
             {
@@ -478,7 +494,7 @@ namespace CustomMap.iOS.Renderers
         {
             if (FormsBetterMaps.iOs13OrNewer)
             {
-                var mapTheme = MapModel.MapTheme;
+                var mapTheme = CustomMapModel.MapTheme;
 
                 MapNative.OverrideUserInterfaceStyle = mapTheme switch
                 {
@@ -492,7 +508,7 @@ namespace CustomMap.iOS.Renderers
 
         private void UpdateMapType()
         {
-            var mapType = MapModel.MapType;
+            var mapType = CustomMapModel.MapType;
             MapNative.MapType = mapType switch
             {
                 MapType.Street => MKMapType.MutedStandard,
@@ -532,8 +548,8 @@ namespace CustomMap.iOS.Renderers
 
         private void PinCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            var itemsToAdd = e.NewItems?.Cast<Pin>()?.ToList() ?? new List<Pin>(0);
-            var itemsToRemove = e.OldItems?.Cast<Pin>()?.Where(p => p.NativeId != null)?.ToList() ?? new List<Pin>(0);
+            var itemsToAdd = e.NewItems?.Cast<CustomPin>()?.ToList() ?? new List<CustomPin>(0);
+            var itemsToRemove = e.OldItems?.Cast<CustomPin>()?.Where(p => p.NativeId != null)?.ToList() ?? new List<CustomPin>(0);
 
             switch (e.Action)
             {
@@ -550,7 +566,7 @@ namespace CustomMap.iOS.Renderers
                 case NotifyCollectionChangedAction.Reset:
                     RemovePins(_pinLookup.Values.ToList());
 
-                    AddPins((Element as Map.Map).Pins);
+                    AddPins((Element as Map.CustomMap).Pins);
                     break;
                 case NotifyCollectionChangedAction.Move:
                     //do nothing
@@ -558,7 +574,7 @@ namespace CustomMap.iOS.Renderers
             }
         }
 
-        private void RemovePins(IList<Pin> pins)
+        private void RemovePins(IList<CustomPin> pins)
         {
             var annotations = pins.Select(p =>
             {
@@ -586,7 +602,7 @@ namespace CustomMap.iOS.Renderers
             MapNative.RemoveAnnotations(annotations);
         }
 
-        private void AddPins(IList<Pin> pins)
+        private void AddPins(IList<CustomPin> pins)
         {
             var selectedAnnotation = default(IMKAnnotation);
 
@@ -596,7 +612,7 @@ namespace CustomMap.iOS.Renderers
                 var annotation = CreateAnnotation(p);
                 p.NativeId = annotation;
 
-                if (ReferenceEquals(p, MapModel.SelectedPin))
+                if (ReferenceEquals(p, CustomMapModel.SelectedCustomPin))
                     selectedAnnotation = annotation;
 
                 _pinLookup.Add(annotation, p);
@@ -612,35 +628,35 @@ namespace CustomMap.iOS.Renderers
 
         private void PinOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is Pin pin &&
+            if (sender is CustomPin pin &&
                 pin.NativeId is FormsMKPointAnnotation annotation &&
-                ReferenceEquals(pin, annotation.Pin))
+                ReferenceEquals(pin, annotation.CustomPin))
             {
-                if (e.PropertyName == Pin.LabelProperty.PropertyName)
+                if (e.PropertyName == CustomPin.LabelProperty.PropertyName)
                 {
                     annotation.SetValueForKey(new NSString(pin.Label), new NSString(nameof(annotation.Title)));
                 }
-                else if (e.PropertyName == Pin.AddressProperty.PropertyName)
+                else if (e.PropertyName == CustomPin.AddressProperty.PropertyName)
                 {
                     annotation.SetValueForKey(new NSString(pin.Address), new NSString(nameof(annotation.Subtitle)));
                 }
-                else if (e.PropertyName == Pin.PositionProperty.PropertyName)
+                else if (e.PropertyName == CustomPin.PositionProperty.PropertyName)
                 {
                     var coord = new CLLocationCoordinate2D(pin.Position.Latitude, pin.Position.Longitude);
                     ((IMKAnnotation)annotation).SetCoordinate(coord);
                 }
-                else if (e.PropertyName == Pin.AnchorProperty.PropertyName)
+                else if (e.PropertyName == CustomPin.AnchorProperty.PropertyName)
                 {
                     if (MapNative.ViewForAnnotation(annotation) is MKAnnotationView view)
                         view.Layer.AnchorPoint = annotation.Anchor;
                 }
-                else if (e.PropertyName == Pin.ZIndexProperty.PropertyName)
+                else if (e.PropertyName == CustomPin.ZIndexProperty.PropertyName)
                 {
                     if (FormsBetterMaps.iOs14OrNewer && MapNative.ViewForAnnotation(annotation) is MKAnnotationView view)
                         view.SetValueForKey(new NSNumber((float)annotation.ZIndex), new NSString(nameof(view.ZPriority)));
                 }
-                else if (e.PropertyName == Pin.ImageSourceProperty.PropertyName ||
-                         e.PropertyName == Pin.TintColorProperty.PropertyName)
+                else if (e.PropertyName == CustomPin.ImageSourceProperty.PropertyName ||
+                         e.PropertyName == CustomPin.TintColorProperty.PropertyName)
                 {
                     pin.ImageSourceCts?.Cancel();
                     pin.ImageSourceCts?.Dispose();
@@ -784,7 +800,7 @@ namespace CustomMap.iOS.Renderers
             return await (imageTask ?? Task.FromResult(default(UIImage))).ConfigureAwait(false);
         }
 
-        protected Pin GetPinForAnnotation(IMKAnnotation annotation)
+        protected CustomPin GetPinForAnnotation(IMKAnnotation annotation)
             => annotation != null && _pinLookup.TryGetValue(annotation, out var p) ? p : null;
         #endregion
 
@@ -817,7 +833,7 @@ namespace CustomMap.iOS.Renderers
                 case NotifyCollectionChangedAction.Reset:
                     RemoveMapElements(_elementLookup.Values.ToList());
 
-                    AddMapElements(MapModel.MapElements);
+                    AddMapElements(CustomMapModel.MapElements);
                     break;
             }
         }
@@ -915,11 +931,11 @@ namespace CustomMap.iOS.Renderers
                 : null;
         #endregion
 
-        private void CleanUpMapModelElements(Map.Map mapModel, MKMapView mapNative)
+        private void CleanUpMapModelElements(Map.CustomMap customMapModel, MKMapView mapNative)
         {
-            MessagingCenter.Unsubscribe<Map.Map, MapSpan>(this, Map.Map.MoveToRegionMessageName);
-            mapModel.Pins.CollectionChanged -= OnPinCollectionChanged;
-            mapModel.MapElements.CollectionChanged -= OnMapElementCollectionChanged;
+            MessagingCenter.Unsubscribe<Map.CustomMap, MapSpan>(this, Map.CustomMap.MoveToRegionMessageName);
+            customMapModel.Pins.CollectionChanged -= OnPinCollectionChanged;
+            customMapModel.MapElements.CollectionChanged -= OnMapElementCollectionChanged;
 
             foreach (var kv in _pinLookup)
             {

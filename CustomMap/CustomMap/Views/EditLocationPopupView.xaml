@@ -4,7 +4,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
              Size="250,200"
-             x:Class="CustomMap.Views.PinClickedPopupView">
+             BackgroundColor="White"
+             Opacity="0"
+             x:Class="CustomMap.Views.EditLocationPopupView">
     <StackLayout>
         <Label Text="{Binding Title}"
                VerticalOptions="CenterAndExpand"

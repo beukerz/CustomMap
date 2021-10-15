@@ -6,9 +6,9 @@ using Xamarin.Forms.Xaml;
 namespace CustomMap.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class PinClickedPopupView : Popup
+    public partial class EditLocationPopupView : Popup
     {
-        public PinClickedPopupView(Location location)
+        public EditLocationPopupView(Location location)
         {
             var viewModel = new EditLocationPopupViewModel(location);
             InitializeComponent();

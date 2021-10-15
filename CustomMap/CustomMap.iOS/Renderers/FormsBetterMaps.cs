@@ -3,7 +3,7 @@ using CustomMap.Map;
 using UIKit;
 using Xamarin.Forms;
 
-[assembly: ExportRenderer(typeof(Map), typeof(MapRenderer))]
+[assembly: ExportRenderer(typeof(CustomMap.Map.CustomMap), typeof(MapRenderer))]
 
 namespace CustomMap.iOS.Renderers
 {

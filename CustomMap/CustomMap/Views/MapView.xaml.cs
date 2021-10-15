@@ -1,6 +1,7 @@
 using CustomMap.Map;
 using CustomMap.ViewModels;
 using Xamarin.Forms;
+using Xamarin.Forms.Maps;
 using Xamarin.Forms.Xaml;
 
 namespace CustomMap.Views

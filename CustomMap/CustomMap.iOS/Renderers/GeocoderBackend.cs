@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AddressBookUI;
 using CoreLocation;
 using CustomMap.Map;
+using Xamarin.Forms.Maps;
 using CCLGeocoder = CoreLocation.CLGeocoder;
 
 namespace CustomMap.iOS.Renderers

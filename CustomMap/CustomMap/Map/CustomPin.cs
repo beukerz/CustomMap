@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using Xamarin.Forms;
@@ -6,36 +7,45 @@ using Xamarin.Forms.Maps;
 
 namespace CustomMap.Map
 {
-    public class Pin : Element
+    public class CustomPin : Element
     {
         public static readonly BindableProperty PinIdProperty =
-            BindableProperty.Create(nameof(PinId), typeof(Guid), typeof(Pin), default(Guid));
+            BindableProperty.Create(nameof(PinId), typeof(Guid), typeof(CustomPin), default(Guid));
+
+        public static readonly BindableProperty TagsProperty =
+            BindableProperty.Create(nameof(Tags), typeof(Dictionary<string, string>), typeof(CustomPin), new Dictionary<string, string>());
         
         public static readonly BindableProperty TintColorProperty =
-            BindableProperty.Create(nameof(TintColor), typeof(Color), typeof(Pin), Color.Transparent);
+            BindableProperty.Create(nameof(TintColor), typeof(Color), typeof(CustomPin), Color.Transparent);
 
         public static readonly BindableProperty PositionProperty =
-            BindableProperty.Create(nameof(Position), typeof(Position), typeof(Pin), default(Position));
+            BindableProperty.Create(nameof(Position), typeof(Position), typeof(CustomPin), default(Position));
 
         public static readonly BindableProperty AddressProperty =
-            BindableProperty.Create(nameof(Address), typeof(string), typeof(Pin), default(string));
+            BindableProperty.Create(nameof(Address), typeof(string), typeof(CustomPin), default(string));
 
         public static readonly BindableProperty LabelProperty =
-            BindableProperty.Create(nameof(Label), typeof(string), typeof(Pin), default(string));
+            BindableProperty.Create(nameof(Label), typeof(string), typeof(CustomPin), default(string));
 
         public static readonly BindableProperty AnchorProperty =
-            BindableProperty.Create(nameof(Anchor), typeof(Point), typeof(Pin), new Point(0.5, 1.0));
+            BindableProperty.Create(nameof(Anchor), typeof(Point), typeof(CustomPin), new Point(0.5, 1.0));
 
         public static readonly BindableProperty ImageSourceProperty =
-            BindableProperty.Create(nameof(ImageSource), typeof(ImageSource), typeof(Pin));
+            BindableProperty.Create(nameof(ImageSource), typeof(ImageSource), typeof(CustomPin));
 
         public static readonly BindableProperty ZIndexProperty =
-            BindableProperty.Create(nameof(ZIndex), typeof(int), typeof(Pin));
+            BindableProperty.Create(nameof(ZIndex), typeof(int), typeof(CustomPin));
 
         public Guid PinId
         {
             get => (Guid)GetValue(PinIdProperty);
             set => SetValue(PinIdProperty, value);
+        }
+        
+        public Dictionary<string, string> Tags
+        {
+            get => (Dictionary<string, string>)GetValue(TagsProperty);
+            set => SetValue(TagsProperty, value);
         }
         
         public Color TintColor
@@ -94,19 +104,19 @@ namespace CustomMap.Map
                 return true;
             if (obj.GetType() != GetType())
                 return false;
-            return Equals((Pin)obj);
+            return Equals((CustomPin)obj);
         }
 
         public override int GetHashCode()
             => HashCode.Combine(PinId, TintColor, Label, Address, Position, ZIndex);
 
-        public static bool operator ==(Pin left, Pin right)
+        public static bool operator ==(CustomPin left, CustomPin right)
             => Equals(left, right);
 
-        public static bool operator !=(Pin left, Pin right)
+        public static bool operator !=(CustomPin left, CustomPin right)
             => !Equals(left, right);
 
-        private bool Equals(Pin other) => other is Pin pin &&
+        private bool Equals(CustomPin other) => other is CustomPin pin &&
             PinId == pin.PinId && 
             TintColor == pin.TintColor &&
             Label == pin.Label &&

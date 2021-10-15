@@ -4,12 +4,12 @@ namespace CustomMap.Map
 {
     public class PinClickedEventArgs : EventArgs
     {
-        public Pin Pin { get; }
+        public CustomPin CustomPin { get; }
         public bool HideInfoWindow { get; set; }
 
-        public PinClickedEventArgs(Pin pin)
+        public PinClickedEventArgs(CustomPin customPin)
         {
-            Pin = pin;
+            CustomPin = customPin;
             HideInfoWindow = false;
         }
     }

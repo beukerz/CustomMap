@@ -11,65 +11,65 @@ using Xamarin.Forms.Maps;
 
 namespace CustomMap.Map
 {
-    public class Map : View, IEnumerable<Pin>
+    public class CustomMap : View, IEnumerable<CustomPin>
     {
         public const string MoveToRegionMessageName = "MapMoveToRegion";
 
         public static readonly BindableProperty MapThemeProperty =
-            BindableProperty.Create(nameof(MapTheme), typeof(MapTheme), typeof(Map), MapTheme.System);
+            BindableProperty.Create(nameof(MapTheme), typeof(MapTheme), typeof(CustomMap), MapTheme.System);
 
         public static readonly BindableProperty MapTypeProperty =
-            BindableProperty.Create(nameof(MapType), typeof(MapType), typeof(Map), default(MapType));
+            BindableProperty.Create(nameof(MapType), typeof(MapType), typeof(CustomMap), default(MapType));
 
         public static readonly BindableProperty IsShowingUserProperty =
-            BindableProperty.Create(nameof(IsShowingUser), typeof(bool), typeof(Map), default(bool));
+            BindableProperty.Create(nameof(IsShowingUser), typeof(bool), typeof(CustomMap), default(bool));
 
         public static readonly BindableProperty ShowUserLocationButtonProperty =
-            BindableProperty.Create(nameof(ShowUserLocationButton), typeof(bool), typeof(Map), default(bool));
+            BindableProperty.Create(nameof(ShowUserLocationButton), typeof(bool), typeof(CustomMap), default(bool));
 
         public static readonly BindableProperty ShowCompassProperty =
-            BindableProperty.Create(nameof(ShowCompass), typeof(bool), typeof(Map), true);
+            BindableProperty.Create(nameof(ShowCompass), typeof(bool), typeof(CustomMap), true);
 
         public static readonly BindableProperty SelectedPinProperty =
-            BindableProperty.Create(nameof(SelectedPin), typeof(Pin), typeof(Map), default(Pin),
-                propertyChanged: (b, o, n) => OnSelectedPinChanged((Map)b, o as Pin, n as Pin));
+            BindableProperty.Create(nameof(SelectedCustomPin), typeof(CustomPin), typeof(CustomMap), default(CustomPin),
+                propertyChanged: (b, o, n) => OnSelectedPinChanged((CustomMap)b, o as CustomPin, n as CustomPin));
 
         public static readonly BindableProperty TrafficEnabledProperty =
-            BindableProperty.Create(nameof(TrafficEnabled), typeof(bool), typeof(Map), default(bool));
+            BindableProperty.Create(nameof(TrafficEnabled), typeof(bool), typeof(CustomMap), default(bool));
 
         public static readonly BindableProperty HasScrollEnabledProperty =
-            BindableProperty.Create(nameof(HasScrollEnabled), typeof(bool), typeof(Map), true);
+            BindableProperty.Create(nameof(HasScrollEnabled), typeof(bool), typeof(CustomMap), true);
 
         public static readonly BindableProperty HasZoomEnabledProperty =
-            BindableProperty.Create(nameof(HasZoomEnabled), typeof(bool), typeof(Map), true);
+            BindableProperty.Create(nameof(HasZoomEnabled), typeof(bool), typeof(CustomMap), true);
 
         public static readonly BindableProperty ItemsSourceProperty =
-            BindableProperty.Create(nameof(ItemsSource), typeof(IEnumerable), typeof(Map), default(IEnumerable),
-                propertyChanged: (b, o, n) => ((Map)b).OnItemsSourcePropertyChanged((IEnumerable)o, (IEnumerable)n));
+            BindableProperty.Create(nameof(ItemsSource), typeof(IEnumerable), typeof(CustomMap), default(IEnumerable),
+                propertyChanged: (b, o, n) => ((CustomMap)b).OnItemsSourcePropertyChanged((IEnumerable)o, (IEnumerable)n));
 
         public static readonly BindableProperty ItemTemplateProperty =
-            BindableProperty.Create(nameof(ItemTemplate), typeof(DataTemplate), typeof(Map), default(DataTemplate),
-                propertyChanged: (b, o, n) => ((Map)b).OnItemTemplatePropertyChanged((DataTemplate)o, (DataTemplate)n));
+            BindableProperty.Create(nameof(ItemTemplate), typeof(DataTemplate), typeof(CustomMap), default(DataTemplate),
+                propertyChanged: (b, o, n) => ((CustomMap)b).OnItemTemplatePropertyChanged((DataTemplate)o, (DataTemplate)n));
 
         public static readonly BindableProperty ItemTemplateSelectorProperty =
-            BindableProperty.Create(nameof(ItemTemplateSelector), typeof(DataTemplateSelector), typeof(Map), default(DataTemplateSelector),
-                propertyChanged: (b, o, n) => ((Map)b).OnItemTemplateSelectorPropertyChanged());
+            BindableProperty.Create(nameof(ItemTemplateSelector), typeof(DataTemplateSelector), typeof(CustomMap), default(DataTemplateSelector),
+                propertyChanged: (b, o, n) => ((CustomMap)b).OnItemTemplateSelectorPropertyChanged());
 
         public static readonly BindableProperty MoveToLastRegionOnLayoutChangeProperty =
-            BindableProperty.Create(nameof(MoveToLastRegionOnLayoutChange), typeof(bool), typeof(Map), defaultValue: false);
+            BindableProperty.Create(nameof(MoveToLastRegionOnLayoutChange), typeof(bool), typeof(CustomMap), defaultValue: false);
 
-        private readonly ObservableRangeCollection<Pin> _pins = new ObservableRangeCollection<Pin>();
+        private readonly ObservableRangeCollection<CustomPin> _pins = new ObservableRangeCollection<CustomPin>();
         private readonly ObservableRangeCollection<MapElement> _mapElements = new ObservableRangeCollection<MapElement>();
         private MapSpan _visibleRegion;
 
-        public Map(MapSpan region)
+        public CustomMap(MapSpan region)
         {
             LastMoveToRegion = region;
             VerticalOptions = HorizontalOptions = LayoutOptions.FillAndExpand;
         }
 
-        // center on Rome by default
-        public Map() : this(new MapSpan(new Position(41.890202, 12.492049), 0.1, 0.1))
+        // center on Hoekenrode by default
+        public CustomMap() : this(new MapSpan(new Position(52.31263774649747, 4.949810556257354), 0.1, 0.1))
         {
         }
 
@@ -102,9 +102,9 @@ namespace CustomMap.Map
             set => SetValue(ShowCompassProperty, value);
         }
 
-        public Pin SelectedPin
+        public CustomPin SelectedCustomPin
         {
-            get => (Pin)GetValue(SelectedPinProperty);
+            get => (CustomPin)GetValue(SelectedPinProperty);
             set => SetValue(SelectedPinProperty, value);
         }
 
@@ -150,7 +150,7 @@ namespace CustomMap.Map
             set => SetValue(MoveToLastRegionOnLayoutChangeProperty, value);
         }
 
-        public ObservableCollection<Pin> Pins => _pins;
+        public ObservableCollection<CustomPin> Pins => _pins;
         public ObservableCollection<MapElement> MapElements => _mapElements;
 
         public event EventHandler<MapClickedEventArgs> MapClicked;
@@ -159,29 +159,32 @@ namespace CustomMap.Map
         public event EventHandler<PinClickedEventArgs> InfoWindowClicked;
         public event EventHandler<PinClickedEventArgs> InfoWindowLongClicked;
 
+        
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool CanSendMapClicked() => MapClicked != null;
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void SendMapClicked(Position position) => MapClicked?.Invoke(this, new MapClickedEventArgs(position));
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool SendPinClick(Pin pin)
+        public bool SendPinClick(CustomPin customPin)
         {
-            var args = new PinClickedEventArgs(pin);
+            var args = new PinClickedEventArgs(customPin);
             PinClicked?.Invoke(this, args);
             return args.HideInfoWindow;
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool SendInfoWindowClick(Pin pin)
+        public bool SendInfoWindowClick(CustomPin customPin)
         {
-            var args = new PinClickedEventArgs(pin);
+            var args = new PinClickedEventArgs(customPin);
             InfoWindowClicked?.Invoke(this, args);
             return args.HideInfoWindow;
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool SendInfoWindowLongClick(Pin pin)
+        public bool SendInfoWindowLongClick(CustomPin customPin)
         {
-            var args = new PinClickedEventArgs(pin);
+            var args = new PinClickedEventArgs(customPin);
             InfoWindowLongClicked?.Invoke(this, args);
             return args.HideInfoWindow;
         }
@@ -209,7 +212,7 @@ namespace CustomMap.Map
         public MapSpan LastMoveToRegion { get; private set; }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        public IEnumerator<Pin> GetEnumerator() => _pins.GetEnumerator();
+        public IEnumerator<CustomPin> GetEnumerator() => _pins.GetEnumerator();
 
         public void MoveToRegion(MapSpan mapSpan)
         {
@@ -233,8 +236,8 @@ namespace CustomMap.Map
             if (newItemTemplate is DataTemplateSelector)
             {
                 throw new NotSupportedException(
-                    $"The {nameof(Map)}.{ItemTemplateProperty.PropertyName} property only supports {nameof(DataTemplate)}." +
-                    $" Set the {nameof(Map)}.{ItemTemplateSelectorProperty.PropertyName} property instead to use a {nameof(DataTemplateSelector)}");
+                    $"The {nameof(CustomMap)}.{ItemTemplateProperty.PropertyName} property only supports {nameof(DataTemplate)}." +
+                    $" Set the {nameof(CustomMap)}.{ItemTemplateSelectorProperty.PropertyName} property instead to use a {nameof(DataTemplateSelector)}");
             }
 
             _pins.Clear();
@@ -249,7 +252,7 @@ namespace CustomMap.Map
 
         private void OnItemsSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var itemsToAdd = e.NewItems?.Cast<object>()?.Select(o => CreatePin(o))?.ToList() ?? new List<Pin>(0);
+            var itemsToAdd = e.NewItems?.Cast<object>()?.Select(o => CreatePin(o))?.ToList() ?? new List<CustomPin>(0);
             var itemsToRemove = (from i in e.OldItems?.Cast<object>() ?? Enumerable.Empty<object>()
                                  join p in _pins on i equals p.BindingContext
                                  select p).ToList();
@@ -269,7 +272,7 @@ namespace CustomMap.Map
                 case NotifyCollectionChangedAction.Reset:
                     _pins.Clear();
 
-                    var newItems = ItemsSource?.Cast<object>()?.Select(o => CreatePin(o))?.ToList() ?? new List<Pin>(0);
+                    var newItems = ItemsSource?.Cast<object>()?.Select(o => CreatePin(o))?.ToList() ?? new List<CustomPin>(0);
                     _pins.AddRange(newItems);
                     break;
                 default:
@@ -283,7 +286,7 @@ namespace CustomMap.Map
             _pins.AddRange(ItemsSource.Cast<object>().Select(o => CreatePin(o)));
         }
 
-        private Pin CreatePin(object newItem)
+        private CustomPin CreatePin(object newItem)
         {
             var itemTemplate = ItemTemplate;
 
@@ -293,7 +296,7 @@ namespace CustomMap.Map
             if (itemTemplate == null)
                 return null;
 
-            var pin = (Pin)itemTemplate.CreateContent();
+            var pin = (CustomPin)itemTemplate.CreateContent();
             pin.BindingContext = newItem;
 
             if (pin.Label == null)
@@ -302,7 +305,7 @@ namespace CustomMap.Map
             return pin;
         }
 
-        private static void OnSelectedPinChanged(Map map, Pin oldValue, Pin newValue)
-            => map.SelectedPinChanged?.Invoke(map, new MapSelectedPinChangedArgs(oldValue, newValue));
+        private static void OnSelectedPinChanged(CustomMap customMap, CustomPin oldValue, CustomPin newValue)
+            => customMap.SelectedPinChanged?.Invoke(customMap, new MapSelectedPinChangedArgs(oldValue, newValue));
     }
 }

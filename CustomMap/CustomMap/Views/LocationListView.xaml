@@ -2,7 +2,14 @@
 
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="http://xamarin.com/schemas/2020/toolkit"
+             Title="Location list"
              x:Class="CustomMap.Views.LocationListView">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:ItemSelectedEventArgsConverter x:Key="ItemSelectedEventArgsConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <ContentPage.Content>
         <StackLayout>
             <Label Text="Hello, from the location list!"
@@ -10,22 +17,19 @@
                    HorizontalOptions="CenterAndExpand" />
             <ListView x:Name="ListView" 
                 ItemsSource="{Binding Locations}">
+                <ListView.Behaviors>
+                    <converters:EventToCommandBehavior EventName="ItemSelected"
+                                                Command="{Binding ItemSelectedCommand}"
+                                                EventArgsConverter="{StaticResource ItemSelectedEventArgsConverter}" />
+                </ListView.Behaviors>
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <ImageCell ImageSource="{Binding PinIcon}" Text="{Binding Label}" Detail="{Binding Address}">
+                        <ImageCell ImageSource="{Binding DisplayedPinIcon}" Text="{Binding Address}">
                             <ImageCell.ContextActions>
-                                <MenuItem Text="Blue" 
-                                          Command="{Binding Path=BindingContext.ChangeColorBlueCommand, Source={x:Reference ListView}}" 
-                                          CommandParameter="{Binding .}"/>
-                                <MenuItem Text="Red" 
-                                          Command="{Binding Path=BindingContext.ChangeColorRedCommand, Source={x:Reference ListView}}" 
-                                          CommandParameter="{Binding .}"/>
-                                <MenuItem Text="Black" 
-                                          Command="{Binding Path=BindingContext.ChangeColorBlackCommand, Source={x:Reference ListView}}" 
-                                          CommandParameter="{Binding .}"/>
-                                <MenuItem Text="Green" 
-                                          Command="{Binding Path=BindingContext.ChangeColorGreenCommand, Source={x:Reference ListView}}" 
-                                          CommandParameter="{Binding .}"/>
+                                <MenuItem Text="Delete" 
+                                          Command="{Binding Path=BindingContext.RemoveLocationCommand, Source={x:Reference ListView}}" 
+                                          CommandParameter="{Binding .}"
+                                          IsDestructive="True"/>
                             </ImageCell.ContextActions>
                         </ImageCell>
                     </DataTemplate>

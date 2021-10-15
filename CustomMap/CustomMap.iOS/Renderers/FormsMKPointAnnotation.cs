@@ -10,20 +10,20 @@ namespace CustomMap.iOS.Renderers
 {
     internal class FormsMKPointAnnotation : MKPointAnnotation
     {
-        public readonly Pin Pin;
+        public readonly CustomPin CustomPin;
 
-        public FormsMKPointAnnotation(Pin pin) : base()
+        public FormsMKPointAnnotation(CustomPin customPin) : base()
         {
-            Pin = pin;
-
-            Title = pin.Label;
-            Subtitle = pin.Address ?? string.Empty;
-            Coordinate = new CLLocationCoordinate2D(pin.Position.Latitude, pin.Position.Longitude);
+            CustomPin = customPin;
+            
+            Title = customPin.Label;
+            Subtitle = customPin.Address ?? string.Empty;
+            Coordinate = new CLLocationCoordinate2D(customPin.Position.Latitude, customPin.Position.Longitude);
         }
 
-        public UIColor TintColor => Pin.TintColor.ToUIColor();
-        public CGPoint Anchor => new CGPoint(Pin.Anchor.X, Pin.Anchor.Y);
-        public int ZIndex => Pin.ZIndex;
-        public ImageSource ImageSource => Pin.ImageSource;
+        public UIColor TintColor => CustomPin.TintColor.ToUIColor();
+        public CGPoint Anchor => new CGPoint(CustomPin.Anchor.X, CustomPin.Anchor.Y);
+        public int ZIndex => CustomPin.ZIndex;
+        public ImageSource ImageSource => CustomPin.ImageSource;
     }
 }

@@ -15,20 +15,62 @@
                    FontSize="24"
                    HorizontalTextAlignment="Center"/>
         </Frame>
-        <map:Map
+        <map:CustomMap
             x:Name="MyCustomMap"
             ItemsSource="{Binding Locations}"
             MapType="Street"
-            IsShowingUser="True">
-            <map:Map.ItemTemplate>
+            IsShowingUser="True"
+            ShowUserLocationButton="True">
+            <map:CustomMap.Behaviors>
+                <behaviors:EventToCommandBehavior 
+                    EventName="PinClicked"
+                    Command="{Binding PinClickedCommand}"/>
+                <behaviors:EventToCommandBehavior 
+                    EventName="SelectedPinChanged"
+                    Command="{Binding SelectedPinChangedCommand}"/>
+                <behaviors:EventToCommandBehavior 
+                    EventName="MapClicked"
+                    Command="{Binding MapClickedCommand}"/>
+            </map:CustomMap.Behaviors>
+            <map:CustomMap.ItemTemplate>
                 <DataTemplate>
-                    <map:Pin Position="{Binding Position}"
+                    <map:CustomPin Position="{Binding Position}"
                                    Address="{Binding Id}"
                                    Label="{Binding Label}"
-                                   ImageSource="{Binding PinIcon}">
-                    </map:Pin>
+                                   ImageSource="{Binding DisplayedPinIcon}"
+                                   PinId="{Binding Id}"
+                                   Tags="{Binding Tags}">
+                    </map:CustomPin>
                 </DataTemplate>
-            </map:Map.ItemTemplate>
-        </map:Map>
+            </map:CustomMap.ItemTemplate>
+        </map:CustomMap>
+        <StackLayout Orientation="Horizontal"
+                     VerticalOptions="End"
+                     HorizontalOptions="CenterAndExpand">
+            <Button BackgroundColor="IndianRed"
+                    BorderColor="{Binding RedButtonBorderColor}"
+                    BorderWidth="1"
+                    Command="{Binding FilterCommand}"
+                    CommandParameter="Red">
+            </Button>
+            <Button BackgroundColor="RoyalBlue"
+                    BorderColor="{Binding BlueButtonBorderColor}"
+                    BorderWidth="1"
+                    Command="{Binding FilterCommand}"
+                    CommandParameter="Blue">
+            </Button>
+            <Button BackgroundColor="SeaGreen"
+                    BorderColor="{Binding GreenButtonBorderColor}"
+                    BorderWidth="1"
+                    Command="{Binding FilterCommand}" 
+                    CommandParameter="Green">
+            </Button>
+            <Button BackgroundColor="DimGray"
+                    BorderColor="{Binding BlackButtonBorderColor}"
+                    BorderWidth="1"
+                    Command="{Binding FilterCommand}" 
+                    CommandParameter="Black">
+            </Button>
+        </StackLayout>
     </StackLayout>
 </ContentPage>

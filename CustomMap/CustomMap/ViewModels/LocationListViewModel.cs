@@ -1,30 +1,38 @@
+using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using CustomMap.Models;
 using CustomMap.Services;
+using CustomMap.Views;
 using Xamarin.Forms;
 
 namespace CustomMap.ViewModels
 {
     public class LocationListViewModel
     {
-        public ObservableCollection<Location> Locations { get; }
+        public ReadOnlyObservableCollection<Location> Locations { get; }
 
         private readonly ILocationService _locationService;
+        private readonly IPageService _pageService;
         
-        public Command ChangeColorBlueCommand => new Command<Location>(location => ChangeToColor(location, PinColor.Blue));
-        public Command ChangeColorRedCommand => new Command<Location>(location => ChangeToColor(location, PinColor.Red));
-        public Command ChangeColorBlackCommand => new Command<Location>(location => ChangeToColor(location, PinColor.Black));
-        public Command ChangeColorGreenCommand => new Command<Location>(location => ChangeToColor(location, PinColor.Green));
+        public Command RemoveLocationCommand => new Command<Location>(RemoveLocation);
+        public Command ItemSelectedCommand => new Command<Location>(async location => await ItemSelected(location));
 
-        private void ChangeToColor(Location location, PinColor pinColor)
+        public LocationListViewModel(ILocationService locationService, IPageService pageService)
         {
-            location.SetPinIcon(pinColor);
+            _locationService = locationService;
+            _pageService = pageService;
+            Locations = _locationService.LocationList;
+        }
+        
+        private async Task ItemSelected(Location location)
+        {
+            await _pageService.ShowPopupAsync(new EditLocationPopupView(location));            
         }
 
-        public LocationListViewModel(ILocationService locationService)
+        private void RemoveLocation(Location location)
         {
-            _locationService = locationService; 
-            Locations = _locationService.LocationList;
+            _locationService.RemoveLocation(location);
         }
     }
 }

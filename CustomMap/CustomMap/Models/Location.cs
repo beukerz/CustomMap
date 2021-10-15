@@ -1,22 +1,22 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using CustomMap.Annotations;
-using CustomMap.Map;
+using Xamarin.Forms.Maps;
 
 namespace CustomMap.Models
 {
     
     public class Location : INotifyPropertyChanged
     {
-        private string _pinIcon;
-
-        public Location(Position position, string address, string label, bool isCommercial, PinColor pinColor)
+        public Location(Position position, string address, string label, bool isCommercial, PinColor pinColor, Dictionary<string, string> tags)
         {
             Position = position;
             Address = address;
-            Label = label;
+            Label = String.Empty;
             IsCommercial = isCommercial;
+            Tags = tags;
             SetPinIcon(pinColor);
         }
 
@@ -25,44 +25,41 @@ namespace CustomMap.Models
         public string Address { get; }
         public string Label { get; }
 
+        public Dictionary<string, string> Tags { get; }
 
-        public string PinIcon
+        private string _displayedPinIcon;
+        public string DisplayedPinIcon
         {
-            get => _pinIcon;
-            set
+            get => _displayedPinIcon;
+            private set
             {
-                if (value != this._pinIcon)
+                if (value != this._displayedPinIcon)
                 {
-                    _pinIcon = value;
+                    _displayedPinIcon = value;
                     OnPropertyChanged();
                 }
             }
         }
+        
+        private string PinIcon { get; set; }
 
         public bool IsCommercial { get; }
         public bool IsSelected { get; private set; }
 
-        public string GetPinIcon => GetPinIconHelper();
-
-        private string GetPinIconHelper()
-        {
-            if (IsSelected && IsCommercial)
-                return "kzm_yellow.png";
-            
-            if (IsSelected && !IsCommercial)
-                return "cs_yellow.png";
-
-            return PinIcon;
-        }
-
         public void MarkSelected()
         {
             IsSelected = true;
+            PinIcon = _displayedPinIcon;
+            if (IsCommercial)
+                DisplayedPinIcon = "kzm_yellow.png";
+            if (!IsCommercial)
+                DisplayedPinIcon = "cs_yellow.png";
         }
 
         public void MarkDeselected()
         {
             IsSelected = false;
+            DisplayedPinIcon = PinIcon;
         }
 
         public void SetPinIcon(PinColor pinColor)
@@ -85,6 +82,8 @@ namespace CustomMap.Models
                     PinIcon = IsCommercial ? "kzm_yellow.png" : "cs_yellow.png";
                     break;
             }
+
+            DisplayedPinIcon = PinIcon;
         }
 
 

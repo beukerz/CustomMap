@@ -9,6 +9,7 @@ namespace CustomMap.DependencyInjection
         public static IServiceCollection ConfigureServices(this IServiceCollection services)
         {
             services.AddSingleton<ILocationService, LocationService>();
+            services.AddTransient<IPageService, PageService>();
             
             return services;
         }

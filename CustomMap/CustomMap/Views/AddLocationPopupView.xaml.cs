@@ -1,19 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Xamarin.Forms;
+using CustomMap.Services;
+using CustomMap.ViewModels;
+using Xamarin.CommunityToolkit.UI.Views;
+using Xamarin.Forms.Maps;
 using Xamarin.Forms.Xaml;
 
 namespace CustomMap.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class AddLocationPopupView : ContentPage
+    public partial class AddLocationPopupView : Popup
     {
-        public AddLocationPopupView()
+        public AddLocationPopupView(Position position)
         {
+            BindingContext = new AddLocationPopupViewModel(position, Startup.ServiceProvider.GetService<ILocationService>(), this);
             InitializeComponent();
         }
     }

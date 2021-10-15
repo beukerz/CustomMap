@@ -3,7 +3,7 @@ using Xamarin.Forms;
 
 namespace CustomMap.ViewModels
 {
-    public class PinClickedPopupViewModel
+    public class EditLocationPopupViewModel
     {
         private readonly Location _location;
         public string Title { get; } = "Change pin color";
@@ -19,7 +19,7 @@ namespace CustomMap.ViewModels
             _location.SetPinIcon(pinColor);
         }
 
-        public PinClickedPopupViewModel(Location location)
+        public EditLocationPopupViewModel(Location location)
         {
             _location = location;
             Address = location.Address;
