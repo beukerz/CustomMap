@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CustomMap.iOS.Renderers;
-using Foundation;
+﻿using Foundation;
 using UIKit;
+using Xamarin;
 
 namespace CustomMap.iOS
 {

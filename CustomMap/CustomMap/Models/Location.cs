@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using CustomMap.Annotations;
-using Xamarin.Forms.Maps;
+using Xamarin.Forms.BetterMaps;
 
 namespace CustomMap.Models
 {
@@ -14,7 +14,7 @@ namespace CustomMap.Models
         {
             Position = position;
             Address = address;
-            Label = String.Empty;
+            Label = label;
             IsCommercial = isCommercial;
             Tags = tags;
             SetPinIcon(pinColor);

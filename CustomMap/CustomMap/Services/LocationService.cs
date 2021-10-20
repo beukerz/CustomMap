@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CustomMap.Models;
-using Xamarin.Forms.Maps;
+using Xamarin.Forms.BetterMaps;
 
 namespace CustomMap.Services
 {

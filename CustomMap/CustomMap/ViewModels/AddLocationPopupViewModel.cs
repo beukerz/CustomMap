@@ -3,7 +3,7 @@ using CustomMap.Models;
 using CustomMap.Services;
 using Xamarin.CommunityToolkit.UI.Views;
 using Xamarin.Forms;
-using Xamarin.Forms.Maps;
+using Xamarin.Forms.BetterMaps;
 
 namespace CustomMap.ViewModels
 {

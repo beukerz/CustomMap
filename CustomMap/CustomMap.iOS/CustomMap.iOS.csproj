@@ -90,11 +90,6 @@
     <ItemGroup>
         <Compile Include="Main.cs" />
         <Compile Include="AppDelegate.cs" />
-        <Compile Include="Renderers\FormsBetterMaps.cs" />
-        <Compile Include="Renderers\FormsMKPointAnnotation.cs" />
-        <Compile Include="Renderers\GeocoderBackend.cs" />
-        <Compile Include="Renderers\ImageSourceExtensions.cs" />
-        <Compile Include="Renderers\MapRenderer.cs" />
         <None Include="Entitlements.plist" />
         <None Include="Info.plist" />
         <Compile Include="Properties\AssemblyInfo.cs" />
@@ -114,7 +109,7 @@
     <ItemGroup>
         <PackageReference Include="Xamarin.CommunityToolkit" Version="1.2.0" />
         <PackageReference Include="Xamarin.Forms" Version="5.0.0.2125" />
-        <PackageReference Include="Xamarin.Forms.Maps" Version="5.0.0.2125" />
+        <PackageReference Include="Xamarin.Forms.BetterMaps" Version="1.3.0" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\CustomMap\CustomMap.csproj">

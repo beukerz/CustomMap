@@ -1,18 +1,15 @@
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CustomMap.Annotations;
-using CustomMap.Map;
 using CustomMap.Models;
 using CustomMap.Services;
 using CustomMap.Views;
 using Xamarin.CommunityToolkit.UI.Views;
 using Xamarin.Forms;
-using Xamarin.Forms.Maps;
-using PinClickedEventArgs = CustomMap.Map.PinClickedEventArgs;
+using Xamarin.Forms.BetterMaps;
 
 namespace CustomMap.ViewModels
 {
@@ -140,7 +137,7 @@ namespace CustomMap.ViewModels
 
         private async Task PinClicked(PinClickedEventArgs args)
         {
-            if (args.CustomPin.BindingContext is Location location)
+            if (args.Pin.BindingContext is Location location)
             {
                 location.MarkSelected();
                 var popup = new EditLocationPopupView(location);

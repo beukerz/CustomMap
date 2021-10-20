@@ -1,7 +1,7 @@
 using CustomMap.Services;
 using CustomMap.ViewModels;
 using Xamarin.CommunityToolkit.UI.Views;
-using Xamarin.Forms.Maps;
+using Xamarin.Forms.BetterMaps;
 using Xamarin.Forms.Xaml;
 
 namespace CustomMap.Views
